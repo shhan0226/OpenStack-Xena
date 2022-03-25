@@ -5,7 +5,6 @@
 ##################################
 IAMACCOUNT=$(whoami)
 echo "${IAMACCOUNT}"
-
 if [ "$IAMACCOUNT" = "root" ]; then
     echo "It's root account."
 else
@@ -24,10 +23,10 @@ read -p "Input Contorller IP: (ex.192.168.0.2) " SET_IP
 read -p "Input Compute1 IP: (ex.192.168.0.3) " SET_IP2
 read -p "Input the allow IP (ex 192.168.0.0/24): " SET_IP_ALLOW
 read -p "Input INTERFACE_NAME: " INTERFACE_NAME_
+read -p "Input STACK_PASSWD: " STACK_PASSWD
 echo "Set IP ...."
 echo "$SET_IP controller" >> /etc/hosts
 echo "$SET_IP2 compute1" >> /etc/hosts
-echo "$SET_IP_ALLOW"
 sudo hostnamectl set-hostname ${H_NAME}
 sync
 
@@ -35,6 +34,7 @@ sync
 # SET Interface 
 ##################################
 mkdir -p /etc/network
+touch /etc/network/interfaces
 echo "auto $INTERFACE_NAME_" >> /etc/network/interfaces
 echo "iface $INTERFACE_NAME_ inet manual" >> /etc/network/interfaces
 echo "up ip link set dev $INTERFACE_NAME_ up" >> /etc/network/interfaces
@@ -65,24 +65,17 @@ sync
 ##################################
 # Install NTP
 ##################################
-apt install chrony -y
+apt install -y chrony
 echo "server controller iburst" >> /etc/chrony/chrony.conf	
 echo "allow $SET_IP_ALLOW" >> /etc/chrony/chrony.conf
 sudo service chrony restart
+read -p "1. Please Install [NTP] >> COMPUTE NODE!! : " CHECKER_NODE
 
 ##################################
 # Install Openstack Client
 ##################################
 add-apt-repository cloud-archive:xena
-sudo apt install python3-openstackclient -y
-
-##################################
-# Version Check
-##################################
-openstack --version
-python --version
-pip --version
-service --status-all|grep +
+sudo apt install -y python3-openstackclient
 
 ##################################
 # SQL database for Ubuntu
@@ -101,14 +94,14 @@ sync
 ##################################
 # Message queue for Ubuntu
 ##################################
-apt install rabbitmq-server -y
+apt install -y rabbitmq-server
 rabbitmqctl add_user openstack stack
 rabbitmqctl set_permissions openstack ".*" ".*" ".*"
 
 ##################################
 # Memcached for Ubuntu
 ##################################
-apt install memcached python3-memcache
+apt install -y memcached python3-memcache
 sed -i s/127.0.0.1/${SET_IP}/ /etc/memcached.conf
 service memcached restart
 
@@ -167,4 +160,388 @@ sudo systemctl daemon-reload
 sudo systemctl enable etcd
 sudo systemctl restart etcd	
 
+##################################
+# Version Check
+##################################
+openstack --version
+python --version
+pip --version
+service --status-all|grep +
 
+##################################
+# Keystone
+##################################
+echo "Keystone !!"
+echo "Keystone CREATE DB ..."
+mysql -e "CREATE DATABASE keystone;"
+mysql -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY '${STACK_PASSWD}';"
+mysql -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY '${STACK_PASSWD}';"
+mysql -e "FLUSH PRIVILEGES;"
+echo "Keystone Install ..."
+apt install -y keystone
+crudini --set /etc/keystone/keystone.conf database connection mysql+pymysql://keystone:${STACK_PASSWD}@controller/keystone
+crudini --set /etc/keystone/keystone.conf token provider fernet
+echo "Keystone Reg DB ..."
+su -s /bin/sh -c "keystone-manage db_sync" keystone
+keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
+keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
+keystone-manage bootstrap --bootstrap-password stack \
+  --bootstrap-admin-url http://controller:5000/v3/ \
+  --bootstrap-internal-url http://controller:5000/v3/ \
+  --bootstrap-public-url http://controller:5000/v3/ \
+  --bootstrap-region-id RegionOne
+echo "Keystone - Apache HTTP server ..."
+echo "ServerName controller" >> /etc/apache2/apache2.conf
+service apache2 restart
+
+##################################
+# admin-openrc
+##################################
+cat > admin-openrc << EOF
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=stack
+export OS_AUTH_URL=http://controller:5000/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+EOF
+cat > demo-openrc << EOF
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_NAME=myproject
+export OS_USERNAME=myuser
+export OS_PASSWORD=stack
+export OS_AUTH_URL=http://controller:5000/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+EOF
+export OS_USERNAME=admin
+export OS_PASSWORD=${STACK_PASSWD}
+export OS_PROJECT_NAME=admin
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_AUTH_URL=http://controller:5000/v3
+export OS_IDENTITY_API_VERSION=3
+
+##################################
+# Keystone 
+##################################
+echo "Keystone - domain, projects, users, and roles ..."
+openstack domain create --description "An Example Domain" example
+openstack project create --domain default \
+  --description "Service Project" service
+openstack project create --domain default \
+  --description "Demo Project" myproject
+openstack user create --domain default \
+  --password ${STACK_PASSWD}  myuser
+openstack role create myrole
+openstack role add --project myproject --user myuser myrole
+echo "Keystone Verify operation ..."
+unset OS_AUTH_URL OS_PASSWORD
+openstack --os-auth-url http://controller:5000/v3 \
+  --os-project-domain-name Default --os-user-domain-name Default \
+  --os-project-name admin --os-username admin token issue
+openstack --os-auth-url http://controller:5000/v3 \
+  --os-project-domain-name Default --os-user-domain-name Default \
+  --os-project-name myproject --os-username myuser token issue
+
+export OS_USERNAME=admin
+export OS_PASSWORD=${STACK_PASSWD}
+export OS_PROJECT_NAME=admin
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_AUTH_URL=http://controller:5000/v3
+export OS_IDENTITY_API_VERSION=3
+openstack token issue
+
+##################################
+# Glance
+##################################
+echo "Glance !!"
+echo "Glance CREATE DB ..."
+mysql -e "CREATE DATABASE glance;"
+mysql -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY '${STACK_PASSWD}';"
+mysql -e "GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY '${STACK_PASSWD}';"
+mysql -e "FLUSH PRIVILEGES;"
+echo "Glance CREATE SERVICE ..."
+openstack user create --domain default --password ${STACK_PASSWD} glance
+openstack role add --project service --user glance admin
+openstack service create --name glance \
+  --description "OpenStack Image" image
+echo "Glance - Create the Image service API endpoints ..."
+openstack endpoint create --region RegionOne \
+  image public http://controller:9292
+openstack endpoint create --region RegionOne \
+  image internal http://controller:9292
+openstack endpoint create --region RegionOne \
+  image admin http://controller:9292
+echo "Glance Install ..."
+apt install -y glance
+crudini --set /etc/glance/glance-api.conf database connection mysql+pymysql://glance:${STACK_PASSWD}@controller/glance
+crudini --set /etc/glance/glance-api.conf keystone_authtoken www_authenticate_uri http://controller:5000
+crudini --set /etc/glance/glance-api.conf keystone_authtoken auth_url http://controller:5000
+crudini --set /etc/glance/glance-api.conf keystone_authtoken memcached_servers controller:11211
+crudini --set /etc/glance/glance-api.conf keystone_authtoken auth_type password
+crudini --set /etc/glance/glance-api.conf keystone_authtoken project_domain_name Default
+crudini --set /etc/glance/glance-api.conf keystone_authtoken user_domain_name Default
+crudini --set /etc/glance/glance-api.conf keystone_authtoken project_name service
+crudini --set /etc/glance/glance-api.conf keystone_authtoken username glance
+crudini --set /etc/glance/glance-api.conf keystone_authtoken password ${STACK_PASSWD}
+crudini --set /etc/glance/glance-api.conf paste_deploy flavor keystone
+crudini --set /etc/glance/glance-api.conf glance_store stores file,http
+crudini --set /etc/glance/glance-api.conf glance_store default_store file
+crudini --set /etc/glance/glance-api.conf glance_store filesystem_store_datadir /var/lib/glance/images/
+echo "Glance Reg. DB ..."
+su -s /bin/sh -c "glance-manage db_sync" glance
+service glance-api restart
+echo "Glance Verify operation ..."
+sync
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=${STACK_PASSWD}
+export OS_AUTH_URL=http://controller:5000/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+wget https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-aarch64-disk.img
+glance image-create --name "cirros" \
+  --file cirros-0.4.0-aarch64-disk.img \
+  --disk-format qcow2 --container-format bare \
+  --visibility=public
+glance image-list
+
+##################################
+# Placement
+##################################
+echo "Placement !!"
+mysql -e "CREATE DATABASE placement;"
+mysql -e "GRANT ALL PRIVILEGES ON placement.* TO 'placement'@'localhost' IDENTIFIED BY '${STACK_PASSWD}';"
+mysql -e "GRANT ALL PRIVILEGES ON placement.* TO 'placement'@'%' IDENTIFIED BY '${STACK_PASSWD}';"
+mysql -e "FLUSH PRIVILEGES;"
+echo "Placement CREATE DB ..."
+openstack user create --domain default --password ${STACK_PASSWD} placement
+openstack role add --project service --user placement admin
+openstack service create --name placement \
+  --description "Placement API" placement
+openstack endpoint create --region RegionOne \
+  placement public http://controller:8778
+openstack endpoint create --region RegionOne \
+  placement internal http://controller:8778
+openstack endpoint create --region RegionOne \
+  placement admin http://controller:8778
+echo "Placement Install ..."
+apt install -y placement-api
+crudini --set /etc/placement/placement.conf placement_database connection mysql+pymysql://placement:${STACK_PASSWD}@controller/placement 
+crudini --set /etc/placement/placement.conf api auth_strategy keystone
+crudini --set /etc/placement/placement.conf keystone_authtoken www_authenticate_uri http://controller:5000/
+crudini --set /etc/placement/placement.conf keystone_authtoken auth_url http://controller:5000/
+crudini --set /etc/placement/placement.conf keystone_authtoken memcached_servers controller:11211
+crudini --set /etc/placement/placement.conf keystone_authtoken auth_type password
+crudini --set /etc/placement/placement.conf keystone_authtoken project_domain_name Default
+crudini --set /etc/placement/placement.conf keystone_authtoken user_domain_name Default
+crudini --set /etc/placement/placement.conf keystone_authtoken project_name service
+crudini --set /etc/placement/placement.conf keystone_authtoken username placement
+crudini --set /etc/placement/placement.conf keystone_authtoken password ${STACK_PASSWD}
+echo "Placement - python (option)"
+placement-manage db sync
+pip install uwsgi
+echo "Placement Verify operation ..."
+placement-status upgrade check
+pip3 install osc-placement
+openstack --os-placement-api-version 1.2 resource class list --sort-column name
+openstack --os-placement-api-version 1.6 trait list --sort-column name
+
+##################################
+# Nova
+##################################
+echo "NOVA !!"
+echo "CREATE DB ..."
+mysql -e "CREATE DATABASE nova_api;"
+mysql -e "CREATE DATABASE nova;"
+mysql -e "CREATE DATABASE nova_cell0;"
+mysql -e "GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'localhost' IDENTIFIED BY '${STACK_PASSWD}';"
+mysql -e "GRANT ALL PRIVILEGES ON nova_api.* TO 'nova'@'%' IDENTIFIED BY '${STACK_PASSWD}';"
+mysql -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'localhost' IDENTIFIED BY '${STACK_PASSWD}';"
+mysql -e "GRANT ALL PRIVILEGES ON nova.* TO 'nova'@'%' IDENTIFIED BY '${STACK_PASSWD}';"
+mysql -e "GRANT ALL PRIVILEGES ON nova_cell0.* TO 'nova'@'localhost' IDENTIFIED BY '${STACK_PASSWD}';"
+mysql -e "GRANT ALL PRIVILEGES ON nova_cell0.* TO 'nova'@'%' IDENTIFIED BY '${STACK_PASSWD}';"
+mysql -e "FLUSH PRIVILEGES;"
+echo "NOVA CREATE SERVICE ..."
+openstack user create --domain default --password ${STACK_PASSWD} nova
+openstack role add --project service --user nova admin
+openstack service create --name nova \
+  --description "OpenStack Compute" compute
+openstack endpoint create --region RegionOne \
+  compute public http://controller:8774/v2.1
+openstack endpoint create --region RegionOne \
+  compute internal http://controller:8774/v2.1
+openstack endpoint create --region RegionOne \
+  compute admin http://controller:8774/v2.1
+echo "NOVA Install ..."
+apt install -y nova-api nova-conductor nova-novncproxy nova-scheduler 
+crudini --set /etc/nova/nova.conf api_database connection mysql+pymysql://nova:${STACK_PASSWD}@controller/nova_api
+crudini --set /etc/nova/nova.conf database connection mysql+pymysql://nova:${STACK_PASSWD}@controller/nova
+crudini --set /etc/nova/nova.conf DEFAULT transport_url rabbit://openstack:${STACK_PASSWD}@controller:5672/
+crudini --set /etc/nova/nova.conf DEFAULT my_ip ${SET_IP}
+crudini --set /etc/nova/nova.conf api auth_strategy keystone
+crudini --set /etc/nova/nova.conf keystone_authtoken www_authenticate_uri http://controller:5000/
+crudini --set /etc/nova/nova.conf keystone_authtoken auth_url http://controller:5000/
+crudini --set /etc/nova/nova.conf keystone_authtoken memcached_servers controller:11211
+crudini --set /etc/nova/nova.conf keystone_authtoken auth_type password
+crudini --set /etc/nova/nova.conf keystone_authtoken project_domain_name Default
+crudini --set /etc/nova/nova.conf keystone_authtoken user_domain_name Default
+crudini --set /etc/nova/nova.conf keystone_authtoken project_name service
+crudini --set /etc/nova/nova.conf keystone_authtoken username nova
+crudini --set /etc/nova/nova.conf keystone_authtoken password ${STACK_PASSWD}
+crudini --set /etc/nova/nova.conf vnc enabled true
+crudini --set /etc/nova/nova.conf vnc server_listen $my_ip
+crudini --set /etc/nova/nova.conf vnc server_proxyclient_address $my_ip
+crudini --set /etc/nova/nova.conf glance api_servers http://controller:9292
+crudini --set /etc/nova/nova.conf oslo_concurrency lock_path /var/lib/nova/tmp
+crudini --set /etc/nova/nova.conf placement region_name RegionOne
+crudini --set /etc/nova/nova.conf placement project_domain_name Default
+crudini --set /etc/nova/nova.conf placement project_name service
+crudini --set /etc/nova/nova.conf placement auth_type password
+crudini --set /etc/nova/nova.conf placement user_domain_name Default
+crudini --set /etc/nova/nova.conf placement auth_url http://controller:5000/v3
+crudini --set /etc/nova/nova.conf placement username placement
+crudini --set /etc/nova/nova.conf placement password ${STACK_PASSWD}
+echo "NOVA Reg. DB ..."
+su -s /bin/sh -c "nova-manage api_db sync" nova
+su -s /bin/sh -c "nova-manage cell_v2 map_cell0" nova
+su -s /bin/sh -c "nova-manage cell_v2 create_cell --name=cell1 --verbose" nova
+su -s /bin/sh -c "nova-manage db sync" nova
+su -s /bin/sh -c "nova-manage cell_v2 list_cells" nova
+echo "NOVA Verify operation ..."
+service nova-api restart
+service nova-scheduler restart
+service nova-conductor restart
+service nova-novncproxy restarts
+read -p "3. Please Install [NOVA] >> COMPUTE NODE!! : " CHECKER_NODE
+sync
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=${STACK_PASSWD}
+export OS_AUTH_URL=http://controller:5000/v3
+export OS_IDENTITY_API_VERSION=3
+export OS_IMAGE_API_VERSION=2
+openstack compute service list --service nova-compute
+su -s /bin/sh -c "nova-manage cell_v2 discover_hosts --verbose" nova
+crudini --set /etc/nova/nova.conf scheduler discover_hosts_in_cells_interval 300
+echo "NOVA Verify operation"
+openstack compute service list
+openstack catalog list
+openstack image list
+nova-status upgrade check
+
+##################################
+# Neutron
+##################################
+mysql -e "CREATE DATABASE neutron;"
+mysql -e "GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'localhost' IDENTIFIED BY '${STACK_PASSWD}';"
+mysql -e "GRANT ALL PRIVILEGES ON neutron.* TO 'neutron'@'%' IDENTIFIED BY '${STACK_PASSWD}';"
+mysql -e "FLUSH PRIVILEGES;"
+echo "Neutron CREATE DB ..."
+openstack user create --domain default --password ${STACK_PASSWD} neutron
+openstack role add --project service --user neutron admin
+openstack service create --name neutron \
+  --description "OpenStack Networking" network
+openstack endpoint create --region RegionOne \
+  network public http://controller:9696
+openstack endpoint create --region RegionOne \
+  network internal http://controller:9696
+openstack endpoint create --region RegionOne \
+  network admin http://controller:9696  
+echo "Networking Option 2: Self-service networks"
+apt install -y neutron-server neutron-plugin-ml2 \
+  neutron-linuxbridge-agent neutron-l3-agent neutron-dhcp-agent \
+  neutron-metadata-agent
+crudini --set /etc/neutron/neutron.conf database connection mysql+pymysql://neutron:${STACK_PASSWD}@controller/neutron
+crudini --set /etc/neutron/neutron.conf DEFAULT core_plugin ml2
+crudini --set /etc/neutron/neutron.conf DEFAULT service_plugins router
+crudini --set /etc/neutron/neutron.conf DEFAULT allow_overlapping_ips true
+crudini --set /etc/neutron/neutron.conf DEFAULT transport_url rabbit://openstack:${STACK_PASSWD}@controller
+crudini --set /etc/neutron/neutron.conf DEFAULT auth_strategy keystone
+crudini --set /etc/neutron/neutron.conf DEFAULT notify_nova_on_port_status_changes true
+crudini --set /etc/neutron/neutron.conf DEFAULT notify_nova_on_port_data_changes true
+crudini --set /etc/neutron/neutron.conf keystone_authtoken www_authenticate_uri http://controller:5000
+crudini --set /etc/neutron/neutron.conf keystone_authtoken auth_url http://controller:5000
+crudini --set /etc/neutron/neutron.conf keystone_authtoken memcached_servers controller:11211
+crudini --set /etc/neutron/neutron.conf keystone_authtoken auth_type password
+crudini --set /etc/neutron/neutron.conf keystone_authtoken project_domain_name default
+crudini --set /etc/neutron/neutron.conf keystone_authtoken user_domain_name default
+crudini --set /etc/neutron/neutron.conf keystone_authtoken project_name service
+crudini --set /etc/neutron/neutron.conf keystone_authtoken username neutron
+crudini --set /etc/neutron/neutron.conf keystone_authtoken password ${STACK_PASSWD}
+crudini --set /etc/neutron/neutron.conf nova auth_url http://controller:5000
+crudini --set /etc/neutron/neutron.conf nova auth_type password
+crudini --set /etc/neutron/neutron.conf nova project_domain_name default
+crudini --set /etc/neutron/neutron.conf nova user_domain_name default
+crudini --set /etc/neutron/neutron.conf nova region_name RegionOne
+crudini --set /etc/neutron/neutron.conf nova project_name service
+crudini --set /etc/neutron/neutron.conf nova username nova
+crudini --set /etc/neutron/neutron.conf nova password ${STACK_PASSWD}
+crudini --set /etc/neutron/neutron.conf oslo_concurrency lock_path /var/lib/neutron/tmp
+echo "Configure the Modular Layer 2 (ML2) plug-in"
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 type_drivers flat,vlan,vxlan
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 tenant_network_types vxlan
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 mechanism_drivers linuxbridge,l2population
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 extension_drivers port_security
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2_type_flat flat_networks provider
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2_type_vxlan vni_ranges 1:1000
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup enable_ipset true
+crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini linux_bridge physical_interface_mappings provider:${INTERFACE_NAME_}
+crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini vxlan enable_vxlan true
+crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini vxlan local_ip ${SET_IP}
+crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini vxlan l2_population true
+crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini securitygroup enable_security_group true
+crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini securitygroup firewall_driver neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
+sysctl net.bridge.bridge-nf-call-iptables
+sysctl net.bridge.bridge-nf-call-ip6tables
+echo "Configure the layer-3 agent"
+crudini --set /etc/neutron/l3_agent.ini DEFAULT interface_driver linuxbridge
+echo "DHCP agent config"
+crudini --set /etc/neutron/dhcp_agent.ini DEFAULT interface_driver linuxbridge
+crudini --set /etc/neutron/dhcp_agent.ini DEFAULT dhcp_driver neutron.agent.linux.dhcp.Dnsmasq
+crudini --set /etc/neutron/dhcp_agent.ini DEFAULT enable_isolated_metadata true
+echo "Configure the metadata agent"
+crudini --set /etc/neutron/metadata_agent.ini DEFAULT nova_metadata_host controller
+crudini --set /etc/neutron/metadata_agent.ini DEFAULT metadata_proxy_shared_secret ${STACK_PASSWD}
+crudini --set /etc/nova/nova.conf neutron auth_url http://controller:5000
+crudini --set /etc/nova/nova.conf neutron auth_type password
+crudini --set /etc/nova/nova.conf neutron project_domain_name default
+crudini --set /etc/nova/nova.conf neutron user_domain_name default
+crudini --set /etc/nova/nova.conf neutron region_name RegionOne
+crudini --set /etc/nova/nova.conf neutron project_name service
+crudini --set /etc/nova/nova.conf neutron username neutron
+crudini --set /etc/nova/nova.conf neutron password ${STACK_PASSWD}
+crudini --set /etc/nova/nova.conf neutron service_metadata_proxy true
+crudini --set /etc/nova/nova.conf neutron metadata_proxy_shared_secret ${STACK_PASSWD}
+echo "Neutron - Finalize installation"
+su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
+  --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
+service nova-api restart
+service neutron-server restart
+service neutron-linuxbridge-agent restart
+service neutron-dhcp-agent restart
+service neutron-metadata-agent restart
+service neutron-l3-agent restart
+read -p "5. Please Install [NETORN] >> COMPUTE NODE!! : " CHECKER_NODE
+
+##################################
+# Horizon
+##################################
+apt install -y openstack-dashboard
+cp /etc/openstack-dashboard/local_settings.py /etc/openstack-dashboard/local_settings.py.backup
+
+sed -i "s/OPENSTACK_HOST = \"127.0.0.1\"/OPENSTACK_HOST = \"${SET_IP}\"/" /etc/openstack-dashboard/local_settings.py
+sed -i "s/'LOCATION': '127.0.0.1:11211',/'LOCATION': '${SET_IP}:11211',/" /etc/openstack-dashboard/local_settings.py
+sed -i 's/http:\/\/\%s\/identity\/v3/http:\/\/\%s:5000\/v3/' /etc/openstack-dashboard/local_settings.py
+sed -i 's/TIME_ZONE = "UTC"/TIME_ZONE = "Asia\/Seoul"/' /etc/openstack-dashboard/local_settings.py
+echo "SESSION_ENGINE = 'django.contrib.sessions.backends.cache'" >> /etc/openstack-dashboard/local_settings.py
+systemctl reload apache2.service
