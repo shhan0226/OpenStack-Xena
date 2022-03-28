@@ -17,6 +17,13 @@ if [ "$CHECKER_NO_" = "yes" ]; then
 else
     echo "Keep Going!!"
 fi
+echo "$H_NAME"
+echo "$SET_IP"
+echo "$SET_IP2"
+echo "$SET_IP_ALLOW"
+echo "$INTERFACE_NAME_"
+echo "$STACK_PASSWD"
+echo "... set!!"
 ##################################
 # Keystone
 ##################################

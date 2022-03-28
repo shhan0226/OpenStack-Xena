@@ -21,6 +21,13 @@ fi
 # auth
 ##################################
 . admin-openrc
+echo "$H_NAME"
+echo "$SET_IP"
+echo "$SET_IP2"
+echo "$SET_IP_ALLOW"
+echo "$INTERFACE_NAME_"
+echo "$STACK_PASSWD"
+echo "... set!!"
 ##################################
 # Neutron
 ##################################
