@@ -9,7 +9,7 @@ if [ "$IAMACCOUNT" = "root" ]; then
     echo "It's root account."
 else
     echo "It's not a root account."
-	exit 100
+	  exit 100
 fi
 
 ##################################

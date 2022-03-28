@@ -40,6 +40,7 @@ sources ./services/compute_setting.sh
 read -p "Install Controller Node (Nova) ?? {yes|no|ENTER=yes} :" CHECKER_Node
 if [ "$CHECKER_Node" = "no" ]; then
     echo "Please Install Contoller Node (Nova)"
+    exit 100
 else
     echo "2. Install Nova ..."
     sources ./services/nova_compute.sh
@@ -48,6 +49,7 @@ fi
 read -p "Install Controller Node (Neutron) ?? {yes|no|ENTER=yes} :" CHECKER_Node
 if [ "$CHECKER_Node" = "no" ]; then
     echo "Please Install Contoller Node (Neutron)"
+    exit 100
 else
     echo "3. Install Neutron ..."
     sources ./services/neutron-compute.sh
