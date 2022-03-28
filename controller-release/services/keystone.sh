@@ -11,7 +11,7 @@ else
     echo "It's not a root account."
 	  exit 100
 fi
-read -p "Check The Input??(yes|no)" CHECKER_NO_
+read -p "Check The Input?? {yes|no|ENTER=yes} " CHECKER_NO_
 if [ "$CHECKER_NO_" = "no" ]; then
     exit 100
 else
