@@ -3,7 +3,7 @@
 echo "Install Controller for OpenStack ..."
 
 
-read -p "Do you want to input ?? (yes|no)" CHECKER_O_
+read -p "Do you want to input ?? {yes|no|ENTER=no}" CHECKER_O_
 if [ "$CHECKER_O_" = "yes" ]; then
     read -p "Input HOSTNAME: " H_NAMEv
     read -p "Input Contorller IP: (ex.192.168.0.2) " SET_IPv
@@ -50,7 +50,7 @@ echo "4. Install Placement ..."
 echo "5. Install Nova ..."
 #source ./services/nova.sh
 
-read -p "Install Compute Node ?? (yes|no)" CHECKER_Node
+read -p "Install Compute Node ?? {yes|no|ENTER=yes}" CHECKER_Node
 if [ "$CHECKER_Node" = "no" ]; then
     echo "6. No Check Compute Node!!"
 else
