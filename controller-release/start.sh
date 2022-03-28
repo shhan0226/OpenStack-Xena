@@ -35,33 +35,33 @@ echo "$STACK_PASSWD"
 echo "... set!!"
 
 echo "1. Install Controller Setting ..."
-#source ./services/controller-setting.sh
+source ./services/controller-setting.sh
 
 echo "2. Install Keystone ..."
-#source ./services/keystone.sh
+source ./services/keystone.sh
 
 echo "3. Install Glance ..."
-#source ./services/glance.sh
+source ./services/glance.sh
 
 echo "4. Install Placement ..."
-#source ./services/placement.sh
+source ./services/placement.sh
 
 echo "5. Install Nova ..."
-#source ./services/nova.sh
+source ./services/nova.sh
 
 read -p "Install Compute Node ?? {yes|no|ENTER=yes} :" CHECKER_Node
 if [ "$CHECKER_Node" = "no" ]; then
     echo "6. No Check Compute Node!!"
 else
     echo "6. Check Compute Node!!"
-    #source ./services/nova_check.sh    
+    source ./services/nova_check.sh    
 fi
 
 echo "7. Install Neutron ..."
-#source ./services/neutron.sh
+source ./services/neutron.sh
 
 echo "8. Install Horizon ..."
-#source ./services/horizon.sh
+source ./services/horizon.sh
 
 
 
