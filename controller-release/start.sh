@@ -19,8 +19,8 @@ if [ "$CHECKER_O_" = "yes" ]; then
     export STACK_PASSWD=STACK_PASSWDv
 else
     export H_NAME="controller"
-    export SET_IP="192.168.1.10"
-    export SET_IP2="192.168.1.11"
+    export SET_IP="192.168.1.5"
+    export SET_IP2="192.168.1.6"
     export SET_IP_ALLOW="192.168.0.0/22"
     export INTERFACE_NAME_="eth0"
     export STACK_PASSWD="stack"  
@@ -35,8 +35,37 @@ echo "$STACK_PASSWD"
 echo "... set!!"
 
 
-echo "Install Controller Setting ..."
-source ./services/controller-setting.sh
+echo "1. Install Controller Setting ..."
+#source ./services/controller-setting.sh
 
-echo "Install Keystone ..."
-#source ./serviceskeystone.sh
+echo "2. Install Keystone ..."
+#source ./services/keystone.sh
+
+echo "3. Install Glance ..."
+#source ./services/glance.sh
+
+echo "4. Install Placement ..."
+#source ./services/placement.sh
+
+echo "5. Install Nova ..."
+#source ./services/nova.sh
+
+read -p "Install Compute Node ?? (yes|no)" CHECKER_Node
+if [ "$CHECKER_Node" = "no" ]; then
+    echo "6. No Check Compute Node!!"
+else
+    echo "6. Check Compute Node!!"
+    #source ./services/nova_check.sh    
+fi
+
+echo "7. Install Neutron ..."
+#source ./services/neutron.sh
+
+echo "8. Install Horizon ..."
+#source ./services/horizon.sh
+
+
+
+
+
+
