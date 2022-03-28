@@ -49,6 +49,7 @@ source ./services/placement.sh
 echo "5. Install Nova ..."
 source ./services/nova.sh
 
+echo "Compelete, Nova!!"
 read -p "Install Compute Node ?? {yes|no|ENTER=yes} :" CHECKER_Node
 if [ "$CHECKER_Node" = "no" ]; then
     echo "6. No Check Compute Node!!"
