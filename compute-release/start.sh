@@ -35,7 +35,7 @@ echo "$STACK_PASSWD"
 echo "... set!!"
 
 echo "1. Install Compute Setting ..."
-sources ./services/compute_setting.sh
+source ./services/compute_setting.sh
 
 read -p "Install Controller Node (Nova) ?? {yes|no|ENTER=yes} :" CHECKER_Node
 if [ "$CHECKER_Node" = "no" ]; then
@@ -43,7 +43,7 @@ if [ "$CHECKER_Node" = "no" ]; then
     exit 100
 else
     echo "2. Install Nova ..."
-    sources ./services/nova_compute.sh
+    source ./services/nova_compute.sh
 fi
 
 read -p "Install Controller Node (Neutron) ?? {yes|no|ENTER=yes} :" CHECKER_Node
@@ -52,7 +52,7 @@ if [ "$CHECKER_Node" = "no" ]; then
     exit 100
 else
     echo "3. Install Neutron ..."
-    sources ./services/neutron-compute.sh
+    source ./services/neutron-compute.sh
 fi
 
 
