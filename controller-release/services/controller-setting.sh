@@ -20,7 +20,6 @@ fi
 ##################################
 # config /etc/hosts
 ##################################
-echo "[IP Setting]"
 sudo apt install net-tools -y
 ifconfig
 echo "Set IP ...."

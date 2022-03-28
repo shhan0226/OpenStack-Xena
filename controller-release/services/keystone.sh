@@ -18,15 +18,6 @@ else
     echo "Keep Going!!"
 fi
 ##################################
-# Inpute value
-##################################
-H_NAME="controller"
-SET_IP="192.168.1.10"
-SET_IP2="192.168.1.11"
-SET_IP_ALLOW="192.168.0.0/22"
-INTERFACE_NAME_="eth0"
-STACK_PASSWD="stack"
-##################################
 # Keystone
 ##################################
 echo "Keystone !!"
