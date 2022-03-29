@@ -18,19 +18,19 @@ if [ "$CHECKER_O_" = "yes" ]; then
     read -p "Input the allow IP (ex 192.168.0.0/24): " SET_IP_ALLOWv
     read -p "Input INTERFACE_NAME: " INTERFACE_NAME_v
     read -p "Input STACK_PASSWD: " STACK_PASSWDv
-    export H_NAME=H_NAMEv
-    export SET_IP=SET_IPv
-    export SET_IP2=SET_IP2v
-    export SET_IP_ALLOW=SET_IP_ALLOWv
-    export INTERFACE_NAME_=INTERFACE_NAME_v
-    export STACK_PASSWD=STACK_PASSWDv
+    export H_NAME=$H_NAMEv
+    export SET_IP=$SET_IPv
+    export SET_IP2=$SET_IP2v
+    export SET_IP_ALLOW=$SET_IP_ALLOWv
+    export INTERFACE_NAME_=$INTERFACE_NAME_v
+    export STACK_PASSWD=$STACK_PASSWDv
 else
-    export H_NAME=H_NAMEv
-    export SET_IP=SET_IPv
-    export SET_IP2=SET_IP2v
-    export SET_IP_ALLOW=SET_IP_ALLOWv
-    export INTERFACE_NAME_=INTERFACE_NAME_v
-    export STACK_PASSWD=STACK_PASSWDv
+    export H_NAME=$H_NAMEv
+    export SET_IP=$SET_IPv
+    export SET_IP2=$SET_IP2v
+    export SET_IP_ALLOW=$SET_IP_ALLOWv
+    export INTERFACE_NAME_=$INTERFACE_NAME_v
+    export STACK_PASSWD=$STACK_PASSWDv
 fi
 
 # INPUT DATA PRINT
