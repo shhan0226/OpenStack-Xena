@@ -45,7 +45,7 @@ echo "... set!!"
 # INSTALL START
 echo "1. Install Compute Setting ..."
 source ./services/compute_setting.sh
-read -p "Install Nova ?? {yes|no|ENTER=yes} :" CHECKER_Node
+read -p "Are you going to install Nova? {yes|no|ENTER=yes} :" CHECKER_Node
 if [ "$CHECKER_Node" = "no" ]; then
     echo "Please Install Contoller Node (Nova)"
     exit 100
@@ -53,7 +53,7 @@ else
     echo "2. Install Nova ..."
     source ./services/nova_compute.sh
 fi
-read -p "Install Neutron ?? {yes|no|ENTER=yes} :" CHECKER_Node
+read -p "Are you going to install Neutron? {yes|no|ENTER=yes} :" CHECKER_Node
 if [ "$CHECKER_Node" = "no" ]; then
     echo "Please Install Contoller Node (Neutron)"
     exit 100
