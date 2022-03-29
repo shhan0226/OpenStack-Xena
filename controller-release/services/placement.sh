@@ -11,7 +11,7 @@ else
     echo "It's not a root account."
 	  exit 100
 fi
-read -p "Do you want to FINISH?? {yes|no|ENTER=no} " CHECKER_NO_
+read -p "Do you want to stop the installation? {yes|no|ENTER=no} " CHECKER_NO_
 if [ "$CHECKER_NO_" = "yes" ]; then
     exit 100
 else
