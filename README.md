@@ -12,6 +12,7 @@
   cd OpenStack-Xena/controller-release
   vi start.sh
   >
+  ...
   # Inpute Value
   H_NAMEv="controller"    # hostname
   SET_IPv="192.168.1.5"   # controller IP
@@ -19,6 +20,7 @@
   SET_IP_ALLOWv="192.168.0.0/22" # allow IP
   INTERFACE_NAME_v="eth0" # interface
   STACK_PASSWDv="stack"   # passwd 
+  ...
   ```
 2. Start the OpenStack installation of the Controller Node
   ```
@@ -34,6 +36,7 @@
   cd OpenStack-Xena/compute-release
   vi start.sh
   >
+  ...
   # Inpute Value
   H_NAMEv="compute1"    # hostname
   SET_IPv="192.168.1.5"   # controller IP
@@ -41,6 +44,7 @@
   SET_IP_ALLOWv="192.168.0.0/22" # allow IP
   INTERFACE_NAME_v="eth0" # interface
   STACK_PASSWDv="stack"   # passwd 
+  ...
   ```
 5. Start the OpenStack installation of the Compute Node
   ```
