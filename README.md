@@ -1,5 +1,5 @@
 # OpenStack-Xena
-- This article is an ARM server-based OpenStack-Xena installation script.
+- This is an ARM server-based OpenStack-Xena installation script.
 
 ## Prerequisites
 - It is based on installing OpenStack on two servers, Controller Node and Compute Node.
