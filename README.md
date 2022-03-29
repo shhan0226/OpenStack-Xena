@@ -55,7 +55,7 @@ source start.sh
 6. Interactive Input (step.2)
 - Default is `[ENTER KEY]`
 - When `Are you going to install Neutron?` occurs, stop input. (in Compute Node)
-- Restart the Openstack installation of Controller Node. (in Compute Node) 
+- Restart the Openstack installation of Controller Node. (in Controller Node) 
 
 
 7. OpenStack Installation on Controller Node
