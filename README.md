@@ -51,7 +51,7 @@
   - Default is `[ENTER KEY]`
   - When `Are you going to install Neutron?` occurs, stop input. (in Compute Node)
   - Restart the Openstack installation of Controller Node. (in Controller Node) 
-7. OpenStack Installation on Controller Node
+7. Install OpenStack on Controller Node
   - When Nova-Compute of Compute Node is installed, proceed with the following script.
     - Check if the Compute Node is operating normally.
   - Proceed with the rest of the script.
