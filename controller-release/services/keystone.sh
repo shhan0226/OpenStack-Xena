@@ -94,12 +94,12 @@ openstack user create --domain default \
 openstack role create myrole
 openstack role add --project myproject --user myuser myrole
 echo "Keystone Verify operation ..."
-unset OS_AUTH_URL OS_PASSWORD
-openstack --os-auth-url http://controller:5000/v3 \
-  --os-project-domain-name Default --os-user-domain-name Default \
-  --os-project-name admin --os-username admin token issue
-openstack --os-auth-url http://controller:5000/v3 \
-  --os-project-domain-name Default --os-user-domain-name Default \
-  --os-project-name myproject --os-username myuser token issue
+#unset OS_AUTH_URL OS_PASSWORD
+#openstack --os-auth-url http://controller:5000/v3 \
+#  --os-project-domain-name Default --os-user-domain-name Default \
+#  --os-project-name admin --os-username admin token issue
+#openstack --os-auth-url http://controller:5000/v3 \
+#  --os-project-domain-name Default --os-user-domain-name Default \
+#  --os-project-name myproject --os-username myuser token issue
 . admin-openrc
 openstack token issue
