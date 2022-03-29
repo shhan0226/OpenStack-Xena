@@ -1,13 +1,13 @@
 # OpenStack-Xena
-- 이 게시글은 ARM서버기반 OpenStack-Xena 설치 스크립트이다.
+- This article is an ARM server-based OpenStack-Xena installation script.
 
 ## Prerequisites
-- Controller Node와 Compute Node 두개의 서버에 OpenStack을 설치를 기준으로 한다.
-- 각 노드의 OS는 ubuntu20.04이다.
+- It is based on installing OpenStack on two servers, Controller Node and Compute Node.
+- The OS of each node is ubuntu20.04.
 
 
 ## Installation
-1. Controller Node의 IP 및 환경설정
+1. Configuration of Controller Node
 ```
 cd OpenStack-Xena/controller-release
 vi start.sh
@@ -21,17 +21,18 @@ INTERFACE_NAME_v="eth0" # interface
 STACK_PASSWDv="stack"   # passwd 
 ```
 
-2. Controller Node의 OpenStack 설치시작 
+2. Start the OpenStack installation of the Controller Node
 ```
 cd OpenStack-Xena/controller-release
 source start.sh
 ```
 
-3. Interactive Input step.1 
-- Default는 `[ENTER KEY]`, Passwd는 `{STACK_PASSWD}`
-- `Is Compute Node installed?`가 발생하면 스크립트 진행을 멈추고, Compute Node의 Openstack 설치를 진행한다.
+3. Interactive Input (step.1)
+- Default is `[ENTER KEY]`, Passwd is `{STACK_PASSWD}`
+- When `Is Compute Node installed?` occurs, stop input. (in Controller Node)
+- Start the Openstack installation of Compute Node. (in Compute Node)
 
-4. Compute Node의 IP 및 환경설정
+4.Configuration of Compute Node
 ```
 cd OpenStack-Xena/compute-release
 vi start.sh
@@ -45,23 +46,25 @@ INTERFACE_NAME_v="eth0" # interface
 STACK_PASSWDv="stack"   # passwd 
 ```
 
-5. Compute Node의 OpenStack 설치시작 
+5. Start the OpenStack installation of the Compute Node
 ```
 cd OpenStack-Xena/compute-release
 source start.sh
 ```
 
-6. Interactive Input step.2
-- Default는 `[ENTER KEY]`
-- `Are you going to install Neutron?`이 발생하면 스크립트 진행을 멈추고, 다시 Controller Node의 Openstack 설치를 진행한다.
+6. Interactive Input (step.2)
+- Default is `[ENTER KEY]`
+- When `Are you going to install Neutron?` occurs, stop input. (in Compute Node)
+- Restart the Openstack installation of Controller Node. (in Compute Node) 
 
-7. Controller Node의 OpenStack 설치
-- Compute Node의 Nova-Compute가 설치되면 다음 스크립트를 진행한다.
-  - Compute Node가 정상적으로 동작하는지 확인한다.
-- 나머지 스크립트를 진행한다.
 
-8. Compute Node의 OpenStack 설치
-- 나머지 스크립트를 진행한다.
+7. OpenStack Installation on Controller Node
+- When Nova-Compute of Compute Node is installed, proceed with the following script.
+  - Check if the Compute Node is operating normally.
+- Proceed with the rest of the script.
+
+8. Install OpenStack on Compute Node
+- Proceed with the rest of the script.
 
 
 
