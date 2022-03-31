@@ -32,7 +32,7 @@ ifconfig
 echo "Set IP ...."
 sed -i "s/127.0.1.1 vraptor/\#127.0.1.1 vraptor/" /etc/hosts
 echo "$SET_IP controller" >> /etc/hosts
-echo "$SET_IP2 compute1" >> /etc/hosts
+echo "$SET_IP2 $H_NAME" >> /etc/hosts
 sudo hostnamectl set-hostname ${H_NAME}
 sync
 ##################################
