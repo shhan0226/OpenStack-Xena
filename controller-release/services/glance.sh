@@ -11,7 +11,7 @@ else
     echo "It's not a root account."
 	  exit 100
 fi
-rread -p "Do you want to install Glance? {yes|no|ENTER=yes} " CHECKER_NO_
+read -p "Do you want to install Glance? {yes|no|ENTER=yes} " CHECKER_NO_
 if [ "$CHECKER_NO_" = "no" ]; then
     exit 100
 else
