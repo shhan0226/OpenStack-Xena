@@ -13,12 +13,12 @@ else
 fi
 echo "Install Controller for OpenStack ..."
 # Inpute Value
-H_NAMEv="controller"
-SET_IPv="192.168.1.5"
-SET_IP2v="192.168.1.6"
-SET_IP_ALLOWv="192.168.0.0/22"
-INTERFACE_NAME_v="eth0"
-STACK_PASSWDv="stack"
+H_NAME="controller"
+SET_IP="192.168.1.5"
+SET_IP2="192.168.1.6"
+SET_IP_ALLOW="192.168.0.0/22"
+INTERFACE_NAME_="eth0"
+STACK_PASSWD="stack"
 # INPUT DATA PRINT
 echo "$H_NAME"
 echo "$SET_IP"
