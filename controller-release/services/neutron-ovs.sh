@@ -47,10 +47,8 @@ openstack endpoint create --region RegionOne \
 openstack endpoint create --region RegionOne \
   network admin http://controller:9696  
 echo "Networking Option 2: Self-service networks"
-apt install -y neutron-server neutron-plugin-ml2 \
-  neutron-l3-agent neutron-dhcp-agent neutron-metadata-agent \  
-  net-tools bridge-utils openvswitch-switch neutron-linuxbridge-agent 
-  
+apt install -y bridge-utils openvswitch-switch
+apt install -y neutron-server neutron-plugin-ml2 neutron-l3-agent neutron-dhcp-agent neutron-metadata-agent neutron-openvswitch-agent 
 crudini --set /etc/neutron/neutron.conf database connection mysql+pymysql://neutron:${STACK_PASSWD}@controller/neutron
 crudini --set /etc/neutron/neutron.conf DEFAULT core_plugin ml2
 crudini --set /etc/neutron/neutron.conf DEFAULT service_plugins router
@@ -125,7 +123,7 @@ su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
   --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
 service nova-api restart
 service neutron-server restart
-service neutron-linuxbridge-agent restart
+service neutron-openvswitch-agent restart
 service neutron-dhcp-agent restart
 service neutron-metadata-agent restart
 service neutron-l3-agent restart
