@@ -71,4 +71,4 @@ crudini --set /etc/nova/nova.conf neutron project_name service
 crudini --set /etc/nova/nova.conf neutron username neutron
 crudini --set /etc/nova/nova.conf neutron password ${STACK_PASSWD}
 service nova-compute restart
-service neutron-linuxbridge-agent restart
+service neutron-openvswitch-agent restart
