@@ -1,5 +1,7 @@
 # Neutron-OVS
-
+- 참고
+  - https://docs.openstack.org/neutron/xena/admin/deploy-ovs-provider.html
+  - https://docs.openstack.org/neutron/xena/admin/deploy-ovs-selfservice.html
 
 ## Controller node
 
