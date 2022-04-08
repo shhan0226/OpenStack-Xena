@@ -171,7 +171,8 @@
 - OVS provider bridge br-provider:
   ```
   sudo ovs-vsctl add-br br-provider
-  sudo ovs-vsctl add-port br-provider PROVIDER_INTERFACE
+  # sudo ovs-vsctl add-port br-provider PROVIDER_INTERFACE 
+  sudo ovs-vsctl add-port br-provider eth0
   sudo netplan apply
   ```
 
