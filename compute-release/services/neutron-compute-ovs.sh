@@ -30,6 +30,7 @@ echo "... set!!"
 echo "Neutron CREATE SERVICE ..."
 apt install openvswitch-switch neutron-openvswitch-agent -y
 crudini --set /etc/neutron/neutron.conf DEFAULT transport_url rabbit://openstack:${STACK_PASSWD}@controller
+crudini --set /etc/neutron/neutron.conf DEFAULT core_plugin ml2
 crudini --set /etc/neutron/neutron.conf DEFAULT auth_strategy keystone
 crudini --set /etc/neutron/neutron.conf keystone_authtoken www_authenticate_uri http://controller:5000
 crudini --set /etc/neutron/neutron.conf keystone_authtoken auth_url http://controller:5000
