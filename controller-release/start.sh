@@ -62,7 +62,14 @@ else
     source ./services/nova_check.sh    
 fi
 echo "7. Install Neutron ..."
-source ./services/neutron.sh
+read -p "Is OVS installed? {yes|no|ENTER=no} :" CHECKER_OVS
+if [ "$CHECKER_OVS" = "yes" ]; then
+    echo "OVS-Neutorn!!"
+    source ./services/neutron-ovs.sh
+else
+    echo "Neutorn!!"
+    source ./services/neutron.sh
+fi
 echo "8. Install Horizon ..."
 source ./services/horizon.sh
 

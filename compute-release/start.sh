@@ -59,11 +59,13 @@ if [ "$CHECKER_Node" = "no" ]; then
     exit 100
 else
     echo "3. Install Neutron ..."
-    source ./services/neutron-compute.sh
+    read -p "Is OVS installed? {yes|no|ENTER=no} :" CHECKER_OVS
+    if [ "$CHECKER_OVS" = "yes" ]; then
+        echo "OVS-Neutorn!!"
+        source ./services/neutron-compute-ovs.sh
+    else
+        echo "Neutorn!!"
+        source ./services/neutron-compute.sh        
+    fi
 fi
-
-
-
-
-
 
