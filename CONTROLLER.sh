@@ -74,7 +74,7 @@ read -p "1. Please Install [NTP] >> COMPUTE NODE!! : " CHECKER_NODE
 ##################################
 # Install Openstack Client
 ##################################
-add-apt-repository cloud-archive:xena
+add-apt-repository -y cloud-archive:xena 
 sudo apt install -y python3-openstackclient
 
 ##################################
