@@ -74,7 +74,7 @@ read -p "1. Please Install [NTP] >> COMPUTE NODE!! : " CHECKER_NODE
 ##################################
 # Install Openstack Client
 ##################################
-add-apt-repository cloud-archive:xena
+sudo add-apt-repository -y cloud-archive:xena 
 sudo apt install -y python3-openstackclient
 
 ##################################
@@ -94,14 +94,14 @@ sync
 ##################################
 # Message queue for Ubuntu
 ##################################
-apt install -y rabbitmq-server
+sudo apt install -y rabbitmq-server
 rabbitmqctl add_user openstack stack
 rabbitmqctl set_permissions openstack ".*" ".*" ".*"
 
 ##################################
 # Memcached for Ubuntu
 ##################################
-apt install -y memcached python3-memcache
+sudo apt install -y memcached python3-memcache
 sed -i s/127.0.0.1/${SET_IP}/ /etc/memcached.conf
 service memcached restart
 
