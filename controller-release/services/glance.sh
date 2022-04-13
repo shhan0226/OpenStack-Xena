@@ -73,5 +73,8 @@ echo "Glance Verify operation ..."
 sync
 . admin-openrc
 wget https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-aarch64-disk.img
+
+## GLANCE TEST
 #glance image-create --name "cirros" --file cirros-0.4.0-aarch64-disk.img --disk-format qcow2 --container-format bare --visibility=public 
+#glance image-create --name "u20-ARM" --file focal-server-cloudimg-arm64.img --disk-format qcow2 --container-format bare --visibility=public
 #glance image-list
