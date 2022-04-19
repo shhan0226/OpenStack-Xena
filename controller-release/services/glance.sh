@@ -11,12 +11,12 @@ else
     echo "It's not a root account."
 	  exit 100
 fi
-read -p "Do you want to install Glance? {yes|no|ENTER=yes} " CHECKER_NO_
-if [ "$CHECKER_NO_" = "no" ]; then
-    exit 100
-else
-    echo "Keep Going!!"
-fi
+#read -p "Do you want to install Glance? {yes|no|ENTER=yes} " CHECKER_NO_
+#if [ "$CHECKER_NO_" = "no" ]; then
+#    exit 100
+#else
+#    echo "Keep Going!!"
+#fi
 ##################################
 # auth
 ##################################
