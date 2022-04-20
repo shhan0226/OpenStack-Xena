@@ -44,7 +44,7 @@ crudini --set /etc/neutron/neutron.conf keystone_authtoken password ${STACK_PASS
 crudini --set /etc/neutron/neutron.conf oslo_concurrency lock_path /var/lib/neutron/tmp
 echo  "Networking Option 2: Self-service networks"
 crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini ovs bridge_mappings provider:${INTERFACE_NAME_}
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini ovs local_ip ${SET_IP}
+crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini ovs local_ip ${SET_IP2}
 crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini agent tunnel_types vxlan 
 crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini agent l2_population True
 crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini securitygroup firewall_driver iptables_hybrid
