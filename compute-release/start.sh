@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Install Controller for OpenStack ..."
+echo "Install Compute for OpenStack ..."
 
 # Inpute Value
 H_NAMEv="compute1"
