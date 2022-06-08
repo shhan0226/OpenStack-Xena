@@ -31,7 +31,7 @@
   - Default is `[ENTER KEY]`, Passwd is `{STACK_PASSWD}`
   - When `Is Compute Node installed?` occurs, stop input. (in Controller Node)
   - Start the Openstack installation of Compute Node. (in Compute Node)
-4.Configuration of Compute Node
+4. Configuration of Compute Node
   ```
   cd OpenStack-Xena/compute-release
   vi start.sh
