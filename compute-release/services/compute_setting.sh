@@ -17,7 +17,8 @@ if [ "$CHECKER_NO_" = "no" ]; then
 else
     echo "Keep Going!!"
 fi
-echo "$H_NAME"
+echo "$CONTROLLER_HOST"
+echo "$COMPUTE_HOST"
 echo "$SET_IP"
 echo "$SET_IP2"
 echo "$SET_IP_ALLOW"
@@ -31,9 +32,9 @@ sudo apt install net-tools -y
 ifconfig
 echo "Set IP ...."
 sed -i "s/127.0.1.1/\#127.0.1.1/" /etc/hosts
-echo "$SET_IP controller" >> /etc/hosts
-echo "$SET_IP2 $H_NAME" >> /etc/hosts
-sudo hostnamectl set-hostname ${H_NAME}
+echo "$SET_IP $CONTROLLER_HOST" >> /etc/hosts
+echo "$SET_IP2 $COMPUTE_HOST" >> /etc/hosts
+sudo hostnamectl set-hostname ${COMPUTE_HOST}
 sync
 ##################################
 # SET Interface 
