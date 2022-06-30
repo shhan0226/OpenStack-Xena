@@ -42,17 +42,17 @@ openstack role add --project service --user placement admin
 openstack service create --name placement \
   --description "Placement API" placement
 openstack endpoint create --region RegionOne \
-  placement public http://controller:8778
+  placement public http://${H_NAMEv}:8778
 openstack endpoint create --region RegionOne \
-  placement internal http://controller:8778
+  placement internal http://${H_NAMEv}:8778
 openstack endpoint create --region RegionOne \
-  placement admin http://controller:8778
+  placement admin http://${H_NAMEv}:8778
 echo "Placement Install ..."
 apt install -y placement-api
-crudini --set /etc/placement/placement.conf placement_database connection mysql+pymysql://placement:${STACK_PASSWD}@controller/placement 
+crudini --set /etc/placement/placement.conf placement_database connection mysql+pymysql://placement:${STACK_PASSWD}@${H_NAMEv}/placement 
 crudini --set /etc/placement/placement.conf api auth_strategy keystone
-crudini --set /etc/placement/placement.conf keystone_authtoken auth_url http://controller:5000/v3
-crudini --set /etc/placement/placement.conf keystone_authtoken memcached_servers controller:11211
+crudini --set /etc/placement/placement.conf keystone_authtoken auth_url http://${H_NAMEv}:5000/v3
+crudini --set /etc/placement/placement.conf keystone_authtoken memcached_servers ${H_NAMEv}:11211
 crudini --set /etc/placement/placement.conf keystone_authtoken auth_type password
 crudini --set /etc/placement/placement.conf keystone_authtoken project_domain_name Default
 crudini --set /etc/placement/placement.conf keystone_authtoken user_domain_name Default
