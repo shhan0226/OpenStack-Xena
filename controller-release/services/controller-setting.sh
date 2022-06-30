@@ -24,7 +24,7 @@ sudo apt install net-tools -y
 ifconfig
 echo "Set IP ...."
 sed -i "s/127.0.1.1/\#127.0.1.1/" /etc/hosts
-echo "$SET_IP controller" >> /etc/hosts
+echo "$SET_IP $H_NAMEv" >> /etc/hosts
 echo "$SET_IP2 compute1" >> /etc/hosts
 sudo hostnamectl set-hostname ${H_NAME}
 sync
@@ -61,7 +61,7 @@ sync
 # Install NTP
 ##################################
 apt install -y chrony
-echo "server controller iburst" >> /etc/chrony/chrony.conf	
+echo "server $H_NAMEv iburst" >> /etc/chrony/chrony.conf	
 echo "allow $SET_IP_ALLOW" >> /etc/chrony/chrony.conf
 sudo service chrony restart
 ##################################
@@ -111,11 +111,11 @@ sudo chown etcd:etcd /etc/etcd
 sudo mkdir -p /var/lib/etcd
 sudo chown etcd:etcd /var/lib/etcd
 touch /etc/etcd/etcd.conf.yml
-echo "name: controller" >> /etc/etcd/etcd.conf.yml
+echo "name: ${H_NAMEv}" >> /etc/etcd/etcd.conf.yml
 echo "data-dir: /var/lib/etcd" >> /etc/etcd/etcd.conf.yml
 echo "initial-cluster-state: 'new'" >> /etc/etcd/etcd.conf.yml
 echo "initial-cluster-token: 'etcd-cluster-01'" >> /etc/etcd/etcd.conf.yml
-echo "initial-cluster: controller=http://${SET_IP}:2380" >> /etc/etcd/etcd.conf.yml
+echo "initial-cluster: ${H_NAMEv}=http://${SET_IP}:2380" >> /etc/etcd/etcd.conf.yml
 echo "initial-advertise-peer-urls: http://${SET_IP}:2380" >> /etc/etcd/etcd.conf.yml
 echo "advertise-client-urls: http://${SET_IP}:2379" >> /etc/etcd/etcd.conf.yml
 echo "listen-peer-urls: http://0.0.0.0:2380" >> /etc/etcd/etcd.conf.yml
