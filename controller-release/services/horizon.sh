@@ -21,7 +21,8 @@ fi
 # auth
 ##################################
 . admin-openrc
-echo "$H_NAME"
+echo "$CONTROLLER_HOST"
+echo "$COMPUTE_HOST"
 echo "$SET_IP"
 echo "$SET_IP2"
 echo "$SET_IP_ALLOW"
