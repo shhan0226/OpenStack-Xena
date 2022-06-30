@@ -17,7 +17,8 @@ fi
 #else
 #    echo "Keep Going!!"
 #fi
-echo "$H_NAME"
+echo "$CONTROLLER_HOST"
+echo "$COMPUTE_HOST"
 echo "$SET_IP"
 echo "$SET_IP2"
 echo "$SET_IP_ALLOW"
@@ -29,11 +30,11 @@ echo "... set!!"
 ##################################
 echo "Neutron CREATE SERVICE ..."
 apt install neutron-linuxbridge-agent -y
-crudini --set /etc/neutron/neutron.conf DEFAULT transport_url rabbit://openstack:${STACK_PASSWD}@controller
+crudini --set /etc/neutron/neutron.conf DEFAULT transport_url rabbit://openstack:${STACK_PASSWD}@${SET_IP}
 crudini --set /etc/neutron/neutron.conf DEFAULT auth_strategy keystone
-crudini --set /etc/neutron/neutron.conf keystone_authtoken www_authenticate_uri http://controller:5000
-crudini --set /etc/neutron/neutron.conf keystone_authtoken auth_url http://controller:5000
-crudini --set /etc/neutron/neutron.conf keystone_authtoken memcached_servers controller:11211
+crudini --set /etc/neutron/neutron.conf keystone_authtoken www_authenticate_uri http://${SET_IP}:5000
+crudini --set /etc/neutron/neutron.conf keystone_authtoken auth_url http://${SET_IP}:5000
+crudini --set /etc/neutron/neutron.conf keystone_authtoken memcached_servers ${SET_IP}:11211
 crudini --set /etc/neutron/neutron.conf keystone_authtoken auth_type password
 crudini --set /etc/neutron/neutron.conf keystone_authtoken project_domain_name default
 crudini --set /etc/neutron/neutron.conf keystone_authtoken user_domain_name default
@@ -51,7 +52,7 @@ crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini securitygroup firew
 sysctl net.bridge.bridge-nf-call-iptables
 sysctl net.bridge.bridge-nf-call-ip6tables
 echo "Configure the Compute service to use the Networking service"
-crudini --set /etc/nova/nova.conf neutron auth_url http://controller:5000
+crudini --set /etc/nova/nova.conf neutron auth_url http://${SET_IP}:5000
 crudini --set /etc/nova/nova.conf neutron auth_type password
 crudini --set /etc/nova/nova.conf neutron project_domain_name default
 crudini --set /etc/nova/nova.conf neutron user_domain_name default
