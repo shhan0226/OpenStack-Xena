@@ -21,7 +21,7 @@ fi
 # auth
 ##################################
 . admin-openrc
-echo "$H_NAME"
+echo "$CONTROLLER_HOST"
 echo "$SET_IP"
 echo "$SET_IP2"
 echo "$SET_IP_ALLOW"
@@ -50,21 +50,21 @@ openstack role add --project service --user nova admin
 openstack service create --name nova \
   --description "OpenStack Compute" compute
 openstack endpoint create --region RegionOne \
-  compute public http://${H_NAMEv}:8774/v2.1
+  compute public http://${SET_IP}:8774/v2.1
 openstack endpoint create --region RegionOne \
-  compute internal http://${H_NAMEv}:8774/v2.1
+  compute internal http://${SET_IP}:8774/v2.1
 openstack endpoint create --region RegionOne \
-  compute admin http://${H_NAMEv}:8774/v2.1
+  compute admin http://${SET_IP}:8774/v2.1
 echo "NOVA Install ..."
 apt install -y nova-api nova-conductor nova-novncproxy nova-scheduler 
-crudini --set /etc/nova/nova.conf api_database connection mysql+pymysql://nova:${STACK_PASSWD}@${H_NAMEv}/nova_api
-crudini --set /etc/nova/nova.conf database connection mysql+pymysql://nova:${STACK_PASSWD}@${H_NAMEv}/nova
-crudini --set /etc/nova/nova.conf DEFAULT transport_url rabbit://openstack:${STACK_PASSWD}@${H_NAMEv}:5672/
+crudini --set /etc/nova/nova.conf api_database connection mysql+pymysql://nova:${STACK_PASSWD}@${SET_IP}/nova_api
+crudini --set /etc/nova/nova.conf database connection mysql+pymysql://nova:${STACK_PASSWD}@${SET_IP}/nova
+crudini --set /etc/nova/nova.conf DEFAULT transport_url rabbit://openstack:${STACK_PASSWD}@${SET_IP}:5672/
 crudini --set /etc/nova/nova.conf DEFAULT my_ip ${SET_IP}
 crudini --set /etc/nova/nova.conf api auth_strategy keystone
-crudini --set /etc/nova/nova.conf keystone_authtoken www_authenticate_uri http://${H_NAMEv}:5000/
-crudini --set /etc/nova/nova.conf keystone_authtoken auth_url http://${H_NAMEv}:5000/
-crudini --set /etc/nova/nova.conf keystone_authtoken memcached_servers ${H_NAMEv}:11211
+crudini --set /etc/nova/nova.conf keystone_authtoken www_authenticate_uri http://${SET_IP}:5000/
+crudini --set /etc/nova/nova.conf keystone_authtoken auth_url http://${SET_IP}:5000/
+crudini --set /etc/nova/nova.conf keystone_authtoken memcached_servers ${SET_IP}:11211
 crudini --set /etc/nova/nova.conf keystone_authtoken auth_type password
 crudini --set /etc/nova/nova.conf keystone_authtoken project_domain_name Default
 crudini --set /etc/nova/nova.conf keystone_authtoken user_domain_name Default
@@ -74,14 +74,14 @@ crudini --set /etc/nova/nova.conf keystone_authtoken password ${STACK_PASSWD}
 crudini --set /etc/nova/nova.conf vnc enabled true
 crudini --set /etc/nova/nova.conf vnc server_listen \$my_ip
 crudini --set /etc/nova/nova.conf vnc server_proxyclient_address\$my_ip
-crudini --set /etc/nova/nova.conf glance api_servers http://${H_NAMEv}:9292
+crudini --set /etc/nova/nova.conf glance api_servers http://${SET_IP}:9292
 crudini --set /etc/nova/nova.conf oslo_concurrency lock_path /var/lib/nova/tmp
 crudini --set /etc/nova/nova.conf placement region_name RegionOne
 crudini --set /etc/nova/nova.conf placement project_domain_name Default
 crudini --set /etc/nova/nova.conf placement project_name service
 crudini --set /etc/nova/nova.conf placement auth_type password
 crudini --set /etc/nova/nova.conf placement user_domain_name Default
-crudini --set /etc/nova/nova.conf placement auth_url http://${H_NAMEv}:5000/v3
+crudini --set /etc/nova/nova.conf placement auth_url http://${SET_IP}:5000/v3
 crudini --set /etc/nova/nova.conf placement username placement
 crudini --set /etc/nova/nova.conf placement password ${STACK_PASSWD}
 echo "NOVA Reg. DB ..."
