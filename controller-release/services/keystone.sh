@@ -17,7 +17,8 @@ fi
 #else
 #    echo "Keep Going!!"
 #fi
-echo "$H_NAME"
+echo "$CONTROLLER_HOST"
+echo "$COMPUTE_HOST"
 echo "$SET_IP"
 echo "$SET_IP2"
 echo "$SET_IP_ALLOW"
@@ -35,26 +36,26 @@ mysql -e "GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY '${
 mysql -e "FLUSH PRIVILEGES;"
 echo "Keystone Install ..."
 apt install -y keystone
-crudini --set /etc/keystone/keystone.conf database connection mysql+pymysql://keystone:${STACK_PASSWD}@${H_NAMEv}/keystone
+crudini --set /etc/keystone/keystone.conf database connection mysql+pymysql://keystone:${STACK_PASSWD}@${SET_IP}/keystone
 crudini --set /etc/keystone/keystone.conf token provider fernet
 echo "Keystone Reg DB ..."
 su -s /bin/sh -c "keystone-manage db_sync" keystone
 keystone-manage fernet_setup --keystone-user keystone --keystone-group keystone
 keystone-manage credential_setup --keystone-user keystone --keystone-group keystone
 keystone-manage bootstrap --bootstrap-password ${STACK_PASSWD} \
-  --bootstrap-admin-url http://${H_NAMEv}:5000/v3/ \
-  --bootstrap-internal-url http://${H_NAMEv}:5000/v3/ \
-  --bootstrap-public-url http://${H_NAMEv}:5000/v3/ \
+  --bootstrap-admin-url http://${SET_IP}:5000/v3/ \
+  --bootstrap-internal-url http://${SET_IP}:5000/v3/ \
+  --bootstrap-public-url http://${SET_IP}:5000/v3/ \
   --bootstrap-region-id RegionOne
 echo "Keystone - Apache HTTP server ..."
-echo "ServerName ${H_NAMEv}" >> /etc/apache2/apache2.conf
+echo "ServerName ${SET_IP}" >> /etc/apache2/apache2.conf
 service apache2 restart
 export OS_USERNAME=admin
 export OS_PASSWORD=${STACK_PASSWD}
 export OS_PROJECT_NAME=admin
 export OS_USER_DOMAIN_NAME=Default
 export OS_PROJECT_DOMAIN_NAME=Default
-export OS_AUTH_URL=http://${H_NAMEv}:5000/v3
+export OS_AUTH_URL=http://${SET_IP}:5000/v3
 export OS_IDENTITY_API_VERSION=3
 ##################################
 # admin-openrc
@@ -65,7 +66,7 @@ export OS_USER_DOMAIN_NAME=Default
 export OS_PROJECT_NAME=admin
 export OS_USERNAME=admin
 export OS_PASSWORD=stack
-export OS_AUTH_URL=http://${H_NAMEv}:5000/v3
+export OS_AUTH_URL=http://${SET_IP}:5000/v3
 export OS_IDENTITY_API_VERSION=3
 export OS_IMAGE_API_VERSION=2
 EOF
@@ -75,7 +76,7 @@ export OS_USER_DOMAIN_NAME=Default
 export OS_PROJECT_NAME=myproject
 export OS_USERNAME=myuser
 export OS_PASSWORD=stack
-export OS_AUTH_URL=http://${H_NAMEv}:5000/v3
+export OS_AUTH_URL=http://${SET_IP}:5000/v3
 export OS_IDENTITY_API_VERSION=3
 export OS_IMAGE_API_VERSION=2
 EOF
