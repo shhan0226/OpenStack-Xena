@@ -41,33 +41,33 @@ openstack role add --project service --user neutron admin
 openstack service create --name neutron \
   --description "OpenStack Networking" network
 openstack endpoint create --region RegionOne \
-  network public http://controller:9696
+  network public http://${H_NAMEv}:9696
 openstack endpoint create --region RegionOne \
-  network internal http://controller:9696
+  network internal http://${H_NAMEv}:9696
 openstack endpoint create --region RegionOne \
-  network admin http://controller:9696  
+  network admin http://${H_NAMEv}:9696  
 echo "Networking Option 2: Self-service networks"
 apt install -y bridge-utils openvswitch-switch
 apt install -y neutron-server neutron-plugin-ml2 neutron-l3-agent neutron-dhcp-agent neutron-metadata-agent neutron-openvswitch-agent 
-crudini --set /etc/neutron/neutron.conf database connection mysql+pymysql://neutron:${STACK_PASSWD}@controller/neutron
+crudini --set /etc/neutron/neutron.conf database connection mysql+pymysql://neutron:${STACK_PASSWD}@${H_NAMEv}/neutron
 crudini --set /etc/neutron/neutron.conf DEFAULT core_plugin ml2
 crudini --set /etc/neutron/neutron.conf DEFAULT service_plugins router
 crudini --set /etc/neutron/neutron.conf DEFAULT allow_overlapping_ips true
-crudini --set /etc/neutron/neutron.conf DEFAULT transport_url rabbit://openstack:${STACK_PASSWD}@controller
+crudini --set /etc/neutron/neutron.conf DEFAULT transport_url rabbit://openstack:${STACK_PASSWD}@${H_NAMEv}
 crudini --set /etc/neutron/neutron.conf DEFAULT auth_strategy keystone
 crudini --set /etc/neutron/neutron.conf DEFAULT dhcp_agents_per_network 2
 crudini --set /etc/neutron/neutron.conf DEFAULT notify_nova_on_port_status_changes true
 crudini --set /etc/neutron/neutron.conf DEFAULT notify_nova_on_port_data_changes true
-crudini --set /etc/neutron/neutron.conf keystone_authtoken www_authenticate_uri http://controller:5000
-crudini --set /etc/neutron/neutron.conf keystone_authtoken auth_url http://controller:5000
-crudini --set /etc/neutron/neutron.conf keystone_authtoken memcached_servers controller:11211
+crudini --set /etc/neutron/neutron.conf keystone_authtoken www_authenticate_uri http://${H_NAMEv}:5000
+crudini --set /etc/neutron/neutron.conf keystone_authtoken auth_url http://${H_NAMEv}:5000
+crudini --set /etc/neutron/neutron.conf keystone_authtoken memcached_servers ${H_NAMEv}:11211
 crudini --set /etc/neutron/neutron.conf keystone_authtoken auth_type password
 crudini --set /etc/neutron/neutron.conf keystone_authtoken project_domain_name default
 crudini --set /etc/neutron/neutron.conf keystone_authtoken user_domain_name default
 crudini --set /etc/neutron/neutron.conf keystone_authtoken project_name service
 crudini --set /etc/neutron/neutron.conf keystone_authtoken username neutron
 crudini --set /etc/neutron/neutron.conf keystone_authtoken password ${STACK_PASSWD}
-crudini --set /etc/neutron/neutron.conf nova auth_url http://controller:5000
+crudini --set /etc/neutron/neutron.conf nova auth_url http://${H_NAMEv}:5000
 crudini --set /etc/neutron/neutron.conf nova auth_type password
 crudini --set /etc/neutron/neutron.conf nova project_domain_name default
 crudini --set /etc/neutron/neutron.conf nova user_domain_name default
@@ -100,9 +100,9 @@ crudini --set /etc/neutron/dhcp_agent.ini DEFAULT dhcp_driver neutron.agent.linu
 crudini --set /etc/neutron/dhcp_agent.ini DEFAULT enable_isolated_metadata true
 crudini --set /etc/neutron/dhcp_agent.ini DEFAULT force_metadata true
 echo "Configure the metadata agent"
-crudini --set /etc/neutron/metadata_agent.ini DEFAULT nova_metadata_host controller
+crudini --set /etc/neutron/metadata_agent.ini DEFAULT nova_metadata_host ${H_NAMEv}
 crudini --set /etc/neutron/metadata_agent.ini DEFAULT metadata_proxy_shared_secret ${STACK_PASSWD}
-crudini --set /etc/nova/nova.conf neutron auth_url http://controller:5000
+crudini --set /etc/nova/nova.conf neutron auth_url http://${H_NAMEv}:5000
 crudini --set /etc/nova/nova.conf neutron auth_type password
 crudini --set /etc/nova/nova.conf neutron project_domain_name default
 crudini --set /etc/nova/nova.conf neutron user_domain_name default
