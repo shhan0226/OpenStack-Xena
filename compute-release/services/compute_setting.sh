@@ -69,7 +69,7 @@ sync
 # Install NTP
 ##################################
 apt install chrony -y
-echo "server controller iburst" >> /etc/chrony/chrony.conf	
+echo "server $CONTROLLER_HOST iburst" >> /etc/chrony/chrony.conf	
 sudo service chrony restart
 chronyc sources
 chronyc sources
