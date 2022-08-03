@@ -1,4 +1,4 @@
-# Xena Installe
+# Xena Install
 - 이 게시글은 ARM서버기반 OpenStack-Xena 설치 스크립트이다.
 
 ## Prerequisites
