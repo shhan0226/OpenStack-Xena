@@ -33,7 +33,6 @@ apt install openvswitch-switch neutron-openvswitch-agent -y
 crudini --set /etc/neutron/neutron.conf DEFAULT transport_url rabbit://openstack:${STACK_PASSWD}@${SET_IP}
 crudini --set /etc/neutron/neutron.conf DEFAULT core_plugin ml2
 crudini --set /etc/neutron/neutron.conf DEFAULT auth_strategy keystone
-crudini --set /etc/neutron/neutron.conf DEFAULT service_plugins router,segments,port_forwarding
 crudini --set /etc/neutron/neutron.conf keystone_authtoken www_authenticate_uri http://${SET_IP}:5000
 crudini --set /etc/neutron/neutron.conf keystone_authtoken auth_url http://${SET_IP}:5000
 crudini --set /etc/neutron/neutron.conf keystone_authtoken memcached_servers ${SET_IP}:11211
@@ -50,7 +49,6 @@ crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini ovs local_ip ${SET_
 crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini agent tunnel_types vxlan 
 crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini agent l2_population True
 crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini securitygroup firewall_driver iptables_hybrid
-crudini --set /etc/neutron/l3_agent.ini agent extensions port_forwarding
 crudini --set /etc/neutron/dhcp_agent.ini DEFAULT interface_driver openvswitch
 crudini --set /etc/neutron/dhcp_agent.ini DEFAULT enable_isolated_metadata True
 crudini --set /etc/neutron/dhcp_agent.ini DEFAULT force_metadata True

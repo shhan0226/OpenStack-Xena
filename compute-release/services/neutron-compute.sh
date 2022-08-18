@@ -32,7 +32,6 @@ echo "Neutron CREATE SERVICE ..."
 apt install neutron-linuxbridge-agent -y
 crudini --set /etc/neutron/neutron.conf DEFAULT transport_url rabbit://openstack:${STACK_PASSWD}@${SET_IP}
 crudini --set /etc/neutron/neutron.conf DEFAULT auth_strategy keystone
-crudini --set /etc/neutron/neutron.conf DEFAULT service_plugins router,segments,port_forwarding
 crudini --set /etc/neutron/neutron.conf keystone_authtoken www_authenticate_uri http://${SET_IP}:5000
 crudini --set /etc/neutron/neutron.conf keystone_authtoken auth_url http://${SET_IP}:5000
 crudini --set /etc/neutron/neutron.conf keystone_authtoken memcached_servers ${SET_IP}:11211
@@ -50,7 +49,6 @@ crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini vxlan local_ip ${SE
 crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini vxlan l2_population true
 crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini securitygroup enable_security_group true
 crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini securitygroup firewall_driver neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
-crudini --set /etc/neutron/l3_agent.ini agent extensions port_forwarding
 sysctl net.bridge.bridge-nf-call-iptables
 sysctl net.bridge.bridge-nf-call-ip6tables
 echo "Configure the Compute service to use the Networking service"
