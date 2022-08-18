@@ -18,14 +18,3 @@ crudini --set /etc/neutron/l3_agent.ini agent extensions port_forwarding
 
 . admin-openrc
 openstack extension list --network
-
-service nova-api restart
-service nova-scheduler restart
-service nova-conductor restart
-service nova-novncproxy restart
-# service nova-compute restart
-service neutron-server restart
-service neutron-openvswitch-agent restart
-service neutron-dhcp-agent restart
-service neutron-metadata-agent restart
-service neutron-l3-agent restart
