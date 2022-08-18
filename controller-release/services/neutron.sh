@@ -52,7 +52,7 @@ apt install -y neutron-server neutron-plugin-ml2 \
   neutron-metadata-agent
 crudini --set /etc/neutron/neutron.conf database connection mysql+pymysql://neutron:${STACK_PASSWD}@${SET_IP}/neutron
 crudini --set /etc/neutron/neutron.conf DEFAULT core_plugin ml2
-crudini --set /etc/neutron/neutron.conf DEFAULT service_plugins router
+crudini --set /etc/neutron/neutron.conf DEFAULT service_plugins router,segments,port_forwarding
 crudini --set /etc/neutron/neutron.conf DEFAULT allow_overlapping_ips true
 crudini --set /etc/neutron/neutron.conf DEFAULT transport_url rabbit://openstack:${STACK_PASSWD}@${SET_IP}
 crudini --set /etc/neutron/neutron.conf DEFAULT auth_strategy keystone
@@ -90,6 +90,7 @@ crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini vxlan local_ip ${SE
 crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini vxlan l2_population true
 crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini securitygroup enable_security_group true
 crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini securitygroup firewall_driver neutron.agent.linux.iptables_firewall.IptablesFirewallDriver
+crudini --set /etc/neutron/l3_agent.ini agent extensions port_forwarding
 sysctl net.bridge.bridge-nf-call-iptables
 sysctl net.bridge.bridge-nf-call-ip6tables
 echo "Configure the layer-3 agent"
