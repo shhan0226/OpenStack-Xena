@@ -51,7 +51,7 @@ apt install -y bridge-utils openvswitch-switch
 apt install -y neutron-server neutron-plugin-ml2 neutron-l3-agent neutron-dhcp-agent neutron-metadata-agent neutron-openvswitch-agent 
 crudini --set /etc/neutron/neutron.conf database connection mysql+pymysql://neutron:${STACK_PASSWD}@${SET_IP}/neutron
 crudini --set /etc/neutron/neutron.conf DEFAULT core_plugin ml2
-crudini --set /etc/neutron/neutron.conf DEFAULT service_plugins router,segments,port_forwarding
+crudini --set /etc/neutron/neutron.conf DEFAULT service_plugins router
 crudini --set /etc/neutron/neutron.conf DEFAULT allow_overlapping_ips true
 crudini --set /etc/neutron/neutron.conf DEFAULT transport_url rabbit://openstack:${STACK_PASSWD}@${SET_IP}
 crudini --set /etc/neutron/neutron.conf DEFAULT auth_strategy keystone
@@ -90,7 +90,6 @@ crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini ovs local_ip ${SET_
 crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini agent tunnel_types vxlan
 crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini agent l2_population True
 crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini securitygroup firewall_driver iptables_hybrid
-crudini --set /etc/neutron/l3_agent.ini agent extensions port_forwarding
 sysctl net.bridge.bridge-nf-call-iptables
 sysctl net.bridge.bridge-nf-call-ip6tables
 echo "Configure the layer-3 agent"
