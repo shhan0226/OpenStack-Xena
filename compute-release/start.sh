@@ -74,11 +74,11 @@ else
     fi
 fi
 
-echo "4. Floating IP port forwarding..."
-read -p "SET PORT FORWARDING? {yes|no|ENTER=no} :" CHECKER_FORWARDING
-if [ "$CHECKER_FORWARDING" = "yes" ]; then
-		source ./services/floating_ip_port_forwarding.sh
-else
-		echo "Done..."
-fi
+# echo "4. Floating IP port forwarding..."
+# read -p "SET PORT FORWARDING? {yes|no|ENTER=no} :" CHECKER_FORWARDING
+# if [ "$CHECKER_FORWARDING" = "yes" ]; then
+# 		source ./services/floating_ip_port_forwarding.sh
+# else
+# 		echo "Done..."
+# fi
 
