@@ -51,19 +51,17 @@ mysql -e "FLUSH PRIVILEGES;"
 
 echo "Cinder CREATE SERVICE ..."
 . admin-openrc
+
 openstack user create --domain default --password ${STACK_PASSWD} cinder
+
 openstack role add --project service --user cinder admin
 
-openstack service create --name cinderv3 \
-  --description "OpenStack Block Storage" volumev3
+openstack service create --name cinderv3 --description "OpenStack Block Storage" volumev3
 
 echo "Create the Block Storage service API endpoints:"
-openstack endpoint create --region RegionOne \
-  volumev3 public http://${SET_IP}:8776/v3/%\(project_id\)s
-openstack endpoint create --region RegionOne \
-  volumev3 internal http://${SET_IP}:8776/v3/%\(project_id\)s
-openstack endpoint create --region RegionOne \
-  volumev3 admin http://${SET_IP}:8776/v3/%\(project_id\)s
+openstack endpoint create --region RegionOne volumev3 public http://${SET_IP}:8776/v3/%\(project_id\)s
+openstack endpoint create --region RegionOne volumev3 internal http://${SET_IP}:8776/v3/%\(project_id\)s
+openstack endpoint create --region RegionOne volumev3 admin http://${SET_IP}:8776/v3/%\(project_id\)s
   
 echo "Cinder Install on Controller..."
 apt install -y cinder-api cinder-scheduler
