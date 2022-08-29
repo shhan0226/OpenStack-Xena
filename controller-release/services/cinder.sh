@@ -60,7 +60,9 @@ openstack service create --name cinderv3 --description "OpenStack Block Storage"
 
 echo "Create the Block Storage service API endpoints:"
 openstack endpoint create --region RegionOne volumev3 public http://${SET_IP}:8776/v3/%\(project_id\)s
+
 openstack endpoint create --region RegionOne volumev3 internal http://${SET_IP}:8776/v3/%\(project_id\)s
+
 openstack endpoint create --region RegionOne volumev3 admin http://${SET_IP}:8776/v3/%\(project_id\)s
   
 echo "Cinder Install on Controller..."
@@ -77,12 +79,15 @@ crudini --set /etc/cinder/cinder.conf keystone_authtoken user_domain_name defaul
 crudini --set /etc/cinder/cinder.conf keystone_authtoken project_name service
 crudini --set /etc/cinder/cinder.conf keystone_authtoken username cinder
 crudini --set /etc/cinder/cinder.conf keystone_authtoken password ${STACK_PASSWD}
-crudini --set /etc/cinder/cinder.conf DEFAULT my_ip 10.0.0.11
+crudini --set /etc/cinder/cinder.conf DEFAULT my_ip ${SET_IP}
 crudini --set /etc/cinder/cinder.conf oslo_concurrency lock_path /var/lib/cinder/tmp
+
 echo "Cinder Reg. DB ..."
 su -s /bin/sh -c "cinder-manage db sync" cinder
+
 echo "Configure Compute to use Block Storage ..."
 crudini --set /etc/nova/nova.conf cinder os_region_name RegionOne
+
 echo "Cinder Verify operation ..."
 service nova-api restart
 service cinder-scheduler restart
