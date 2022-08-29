@@ -8,7 +8,7 @@ COMPUTE_HOSTv="compute1"
 SET_IPv="192.168.1.5"
 SET_IP2v="192.168.1.6"
 SET_IP_ALLOWv="192.168.0.0/22"
-INTERFACE_NAME_v="eth0"
+INTERFACE_NAME_v="eth0|enP6p1s0|br-provider"
 STACK_PASSWDv="stack"
 
 read -p "Do you want to input ?? {yes|no|ENTER=no}" CHECKER_O_
